@@ -1,27 +1,34 @@
 #!/bin/bash
 
-# Script for cp2k job submission in Daint
-# Usage: ./cp2k [options] input.inp
-#   Options:
-#    --manual, -m The script will display all the available queues and
-#                 it will ask for all required options.
-#    --queue, -q  Name of que queue
-#    --nodes, -n  Number of nodes
-#    --time, -t   Maximum time for the job
-#
-# input.inp can be any name, the .inp extension is optional
-
+# Script to submit CP2K jobs using the slurm queue system. Intended for Alps.
+# Before using it:
+#   - Modify account and cp2k_path accordingly
+# 
 # This script will:
-# 1 Setup the queue, number of nodes and max time for the job
-#   by default it will use normal queue with 1 node and 6 hours.
-# 2 Copy the input to the scratch directory
-#   create the jobfile for the slurm system and submit the calculation
-# 3 Submit the jobfile
-#
-# The calculation itself is run using the jobfile script,
-# it also deletes temporal files and copies the output to the
-# directory where this script was called with the name input.out
+#  1 Create a work directory with the name of the input and the PID of the script in the scratch directory. 
+#  2 Copy the input and restart files if necessary to that work directory.
+#  3 Build the jobfile for the slurm system based on the selected options in the work directory.
+#  4 Submit the jobfile
+#  
+# All calculation outputs will be left in the work directory
+# 
+# Usage:
+# ./runcp2k [options] input.inp
+# 
+#   Options:
+#     --manual, -m 
+#                  The script will display all the available queues and
+#                  it will ask for all required options.
+#     --queue, -q  
+#                  Name of que queue
+#     --nodes, -n  
+#                  Number of nodes
+#     --time, -t   
+#                  Maximum time for the job
+# 
+# input.inp can be any name, the .inp extension is optional.
 
+# Modify account and cp2k_path accordingly!
 # Account for the queueing system
 account=""
 # Set the path to CP2K
